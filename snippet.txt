@@ -1,0 +1,257 @@
+﻿// PartyManager class
+class PartyManager
+{
+    private double costPerPerson;
+    private double feePerPerson;
+    private string[] guestList;
+    private int numOfElems;
+
+    public PartyManager(int capacity)
+    {
+        guestList = new string[capacity];
+        numOfElems = 0;
+    }
+
+    public double CostPerPerson
+    {
+        get { return costPerPerson; }
+        set { costPerPerson = value; }
+    }
+
+    public double FeePerPerson
+    {
+        get { return feePerPerson; }
+        set { feePerPerson = value; }
+    }
+
+    public int NumOfGuests
+    {
+        get { return numOfElems; }
+    }
+
+    public string[] GetGuestList()
+    {
+        return guestList.Take(numOfElems).ToArray();
+    }
+
+    public double CalculateTotalCost()
+    {
+        return numOfElems * costPerPerson;
+    }
+
+    public bool AddNewGuest(string firstName, string lastName)
+    {
+        if (numOfElems < guestList.Length)
+        {
+            guestList[numOfElems] = FormatName(firstName, lastName);
+            numOfElems++;
+            return true;
+        }
+        return false;
+    }
+
+    public bool RemoveGuest(int index)
+    {
+        if (index >= 0 && index < numOfElems)
+        {
+            guestList[index] = string.Empty;
+            MoveElementsOneStepToLeft(index);
+            numOfElems--;
+            return true;
+        }
+        return false;
+    }
+
+    private void MoveElementsOneStepToLeft(int startIndex)
+    {
+        for (int i = startIndex; i < numOfElems - 1; i++)
+        {
+            guestList[i] = guestList[i + 1];
+        }
+    }
+
+    private string FormatName(string firstName, string lastName)
+    {
+        return $"{lastName.ToUpper()}, {firstName}";
+    }
+}
+
+// MainForm class
+public partial class MainForm : Form
+{
+    private PartyManager partyManager;
+
+    public MainForm()
+    {
+        InitializeComponent();
+        InitializeGUI();
+    }
+
+    private void InitializeGUI()
+    {
+        // Initialize GUI components
+    }
+
+    private void btnCreateList_Click(object sender, EventArgs e)
+    {
+        // Code to create a new PartyManager instance
+        int totalGuests;
+        if (int.TryParse(txtTotalGuests.Text, out totalGuests) && totalGuests > 0)
+        {
+            partyManager = new PartyManager(totalGuests);
+            partyManager.CostPerPerson = ParseDouble(txtCostPerPerson.Text);
+            partyManager.FeePerPerson = ParseDouble(txtFeePerPerson.Text);
+            EnableGuestInput(true);
+            lstGuests.Items.Clear();
+        }
+        else
+        {
+            MessageBox.Show("Invalid total guests value.", "Error");
+        }
+    }
+
+    private void btnAdd_Click(object sender, EventArgs e)
+    {
+        // Code to add a new guest
+        string firstName = txtFirstName.Text;
+        string lastName = txtLastName.Text;
+
+        if (!string.IsNullOrWhiteSpace(firstName) && !string.IsNullOrWhiteSpace(lastName))
+        {
+            if (partyManager.AddNewGuest(firstName, lastName))
+            {
+                UpdateGuestList();
+                ClearInputFields();
+            }
+            else
+            {
+                MessageBox.Show("Guest list is full.", "Error");
+            }
+        }
+        else
+        {
+            MessageBox.Show("Invalid name input.", "Error");
+        }
+    }
+
+    private void btnDelete_Click(object sender, EventArgs e)
+    {
+        // Code to delete a guest
+        int selectedIndex = lstGuests.SelectedIndex;
+        if (selectedIndex >= 0)
+        {
+            partyManager.RemoveGuest(selectedIndex);
+            UpdateGuestList();
+        }
+        else
+        {
+            MessageBox.Show("Select a guest to delete.", "Error");
+        }
+    }
+
+    private void UpdateGuestList()
+    {
+        lstGuests.Items.Clear();
+        foreach (var guest in partyManager.GetGuestList())
+        {
+            lstGuests.Items.Add(guest);
+        }
+    }
+
+    private void ClearInputFields()
+    {
+        txtFirstName.Clear();
+        txtLastName.Clear();
+    }
+
+    private void EnableGuestInput(bool enable)
+    {
+        txtFirstName.Enabled = enable;
+        txtLastName.Enabled = enable;
+        btnAdd.Enabled = enable;
+        btnDelete.Enabled = enable;
+    }
+
+    private double ParseDouble(string input)
+    {
+        double result;
+        double.TryParse(input, out result);
+        return result;
+    }
+}
+
+
+This example assumes that you have a Windows Forms application with the appropriate textboxes 
+(txtTotalGuests, txtCostPerPerson, txtFeePerPerson, txtFirstName, txtLastName) and a listbox (lstGuests) on your form. 
+You'll also need buttons (btnCreateList, btnAdd, btnDelete) for creating a new party, 
+adding a guest, and deleting a guest, respectively. Make sure to replace the placeholders with your actual control names.
+
+
+
+private string[] names;
+        private string[] phones;
+        private string[,] phoneList;
+
+        public PhoneBook()
+        {
+            names = new string[] { "Friend1", "Friend2", "Friend3", "Friend4", "Friend5" };
+            phones = new string[] { "111-1111", "222-2222", "333-3333", "444-4444", "555-5555" };
+
+            DisplayList();
+            SortByName();
+            DisplayList();
+
+            phoneList = new string[5, 2];
+            FillTable();
+            DisplayTable();
+        }
+
+        public void DisplayList()
+        {
+            Console.WriteLine("Phone Book:");
+            for (int i = 0; i < names.Length; i++)
+            {
+                Console.WriteLine($"{names[i]} - {phones[i]}");
+            }
+            Console.WriteLine();
+        }
+
+        public void SortByName()
+        {
+            for (int i = 0; i < names.Length - 1; i++)
+            {
+                for (int j = 0; j < names.Length - 1 - i; j++)
+                {
+                    if (string.Compare(names[j], names[j + 1]) > 0)
+                    {
+                        Swap(ref names[j], ref names[j + 1]);
+                        Swap(ref phones[j], ref phones[j + 1]);
+                    }
+                }
+            }
+        }
+
+        private void Swap(ref string a, ref string b)
+        {
+            string temp = a;
+            a = b;
+            b = temp;
+        }
+
+        public void FillTable()
+        {
+            for (int row = 0; row < names.Length; row++)
+            {
+                phoneList[row, 0] = names[row];
+                phoneList[row, 1] = phones[row];
+            }
+        }
+
+        public void DisplayTable()
+        {
+            Console.WriteLine("Phone Book Table:");
+            for (int row = 0; row < names.Length; row++)
+            {
+                Console.WriteLine($"{phoneList[row, 0]} - {phoneList[row, 1]}");
+            }
+            Console.WriteLine();
